@@ -1,0 +1,261 @@
+openapi: 3.0.0
+info:
+    title: User API
+    version: 1.0.0
+    description: API for user management
+paths:
+    /api/users/{id}:
+        get:
+            summary: Get user by id
+            tags: [Users]
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: number
+            responses:
+                200:
+                    description: User retrieved successfully
+                404:
+                    description: User not found
+
+    /api/users:
+        post:
+            summary: Register a new user
+            tags: [Users]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                    format: email
+                                password:
+                                    type: string
+                                    minLength: 6
+                                avatar:
+                                    type: string
+                                    format: uri
+            responses:
+                201:
+                    description: User registered successfully
+                400:
+                    description: User already exists
+
+    /api/feedback:
+        get:
+            summary: Get all feedbacks
+            tags: [Feedbacks]
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: integer
+                                        title:
+                                            type: string
+                                        description:
+                                            type: string
+                                        category:
+                                            type: string
+                                        status:
+                                            type: string
+                                        authorId:
+                                            type: integer
+                                        createdAt:
+                                            type: string
+                                            format: date-time
+                                        updatedAt:
+                                            type: string
+                                            format: date-time
+                500:
+                    description: Internal server error
+
+        post:
+            summary: Post a new feedback
+            tags: [Feedbacks]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                title:
+                                    type: string
+                                description:
+                                    type: string
+                                category:
+                                    type: string
+                                status:
+                                    type: string
+                                authorId:
+                                    type: number
+            responses:
+                201:
+                    description: Feedback created successfully
+                400:
+                    description: Bad request
+                500:
+                    description: Internal server error
+
+    /api/feedback/{id}:
+        put:
+            summary: Update a feedback entry
+            tags: [Feedbacks]
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: number
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                title:
+                                    type: string
+                                description:
+                                    type: string
+                                category:
+                                    type: string
+                                status:
+                                    type: string
+            responses:
+                200:
+                    description: Feedback updated successfully
+                    content:
+                        application/json:
+                            schema:
+                            type: object
+                            properties:
+                                id:
+                                    type: number
+                                title:
+                                    type: string
+                                description:
+                                    type: string
+                                category:
+                                    type: string
+                                status:
+                                    type: string
+                                authorId:
+                                    type: integer
+                                createdAt:
+                                    type: string
+                                    format: date-time
+                                updatedAt:
+                                    type: string
+                                    format: date-time
+                400:
+                    description: Bad request (e.g., missing required fields)
+                404:
+                    description: Feedback not found
+                500:
+                    description: Internal server error
+
+        delete:
+            summary: Delete a feedback by id
+            tags: [Feedbacks]
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: number
+            responses:
+                204:
+                    description: Feedback deleted successfully
+                404:
+                    description: Feedback not found
+                500:
+                    description: Internal server error
+
+    /api/feedback/statuses:
+        get:
+            summary: Get available feedback statuses
+            tags: [FeedbackStatuses]
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: string
+                                    enum:
+                                        - Идея
+                                        - Запланировано
+                                        - В_работе
+                                        - Выполнено
+
+    /api/feedback/categories:
+        get:
+            summary: Get available feedback statuses
+            tags: [FeedbackCategories]
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: string
+                                    enum:
+                                        - Функциональность
+                                        - Баг
+                                        - UI
+                                        - Производительность
+
+    /api/vote/:
+        post:
+            summary: Create a vote for a feedback proposal
+            tags: [Votes]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                feedbackId:
+                                    type: number
+                                userId:
+                                    type: number
+            responses:
+                201:
+                    description: Vote created successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                id:
+                                    type: integer
+                                    description: The ID of the created vote
+                                userId:
+                                    type: integer
+                                    description: The ID of the user who voted
+                                feedbackId:
+                                    type: integer
+                                    description: The ID of the feedback proposal voted on
+                                createdAt:
+                                    type: string
+                                    format: date-time
+                                    description: The timestamp when the vote was created
+                400:
+                    description: Bad request (probably missing feedbackId or userId)
+                500:
+                    description: Internal server error

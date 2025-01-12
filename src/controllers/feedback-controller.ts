@@ -1,16 +1,14 @@
 import { Body, Delete, Get, JsonController, Param, Post, Put, Res } from 'routing-controllers';
 import { Response } from 'express';
 import { FeedbackModel } from '../models/feedback-model';
-import { FeedbackStatuses } from '../models/enums/feedback-statuses';
-import { FeedbackCategories } from '../models/enums/feedback-categories';
 import { FeedbackRepository } from '../repositories/feedback-repository';
+import { StatusCodes } from 'http-status-codes';
+import { NonexistentError } from '../errors/nonexistent-error';
 
 @JsonController('/feedback')
 export class FeedbackController {
 
-    private feedbackRepository: FeedbackRepository;
-
-    constructor() {
+    constructor(private feedbackRepository: FeedbackRepository) {
         this.feedbackRepository = new FeedbackRepository();
     }
 
@@ -22,7 +20,7 @@ export class FeedbackController {
             return feedbacks;
         }
         catch (error) {
-            response.status(500).json({ error: 'Failed to retrieve feedbacks' });
+            response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to retrieve feedbacks' });
         }
     }
 
@@ -32,11 +30,11 @@ export class FeedbackController {
         try {
             const newFeedback = await this.feedbackRepository.createAsync(feedback as FeedbackModel);
 
-            return response.status(201).json(newFeedback);
+            return response.status(StatusCodes.CREATED).json(newFeedback);
         }
         catch (error) {
             console.error(error);
-            response.status(500).json({ message: 'Internal server error' });
+            response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
         }
     };
 
@@ -49,12 +47,11 @@ export class FeedbackController {
         }
         catch (error: any) {
             console.error(error);
-            if (error.message === 'Feedback not found') {
-
-                return response.status(404).json({ message: 'Feedback not found' });
+            if (error instanceof NonexistentError) {
+                return response.status(StatusCodes.NOT_FOUND).json({ message: error.message });
             }
 
-            return response.status(500).json({ message: 'Internal server error' });
+            return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
         }
     };
 
@@ -63,25 +60,38 @@ export class FeedbackController {
         try {
             const deletedFeedback = this.feedbackRepository.deleteAsync(id);
 
-            return response.status(204).json(deletedFeedback);
+            return response.status(StatusCodes.NO_CONTENT).json(deletedFeedback);
         }
         catch (error) {
+            if (error instanceof NonexistentError) {
+                return response.status(StatusCodes.NOT_FOUND).json({ message: error.message });
+            }
             console.error(error);
-            response.status(500).json({ message: 'Internal server error' });
+            return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
         }
     };
 
     @Get('/statuses')
-    async getAvailableStatusesAsync() {
-        return FeedbackStatuses;
+    async getAvailableStatusesAsync(@Res() response: any) {
+        try {
+            const statuses = this.feedbackRepository.getAllStatusesAsync();
+
+            return statuses;
+        }
+        catch (error) {
+            response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to retrieve feedback statuses' });
+        }
     };
 
     @Get('/categories')
-    async getAvailableCategoriesAsync() {
-        return FeedbackCategories;
-    };
-}
+    async getAvailableCategoriesAsync(@Res() response: any) {
+        try {
+            const categories = this.feedbackRepository.getAllCategoriesAsync();
 
-function postFeedbackService(arg0: FeedbackModel) {
-    throw new Error('Function not implemented.');
+            return categories;
+        }
+        catch (error) {
+            response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to retrieve feedback categories' });
+        }
+    };
 }

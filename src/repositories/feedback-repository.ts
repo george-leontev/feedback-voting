@@ -1,15 +1,24 @@
 import { prisma } from '../app';
+import { NonexistentError } from '../errors/nonexistent-error';
 import { FeedbackModel } from '../models/feedback-model';
 
 export class FeedbackRepository {
     async getAllAsync() {
-        const feedbacks = await prisma.feedback.findMany({
-            include: {
-                author: true, // Include author information
-            },
-        });
+        const feedbacks = await prisma.feedback.findMany();
 
         return feedbacks
+    }
+
+    async getAllStatusesAsync() {
+        const statuses = await prisma.feedbackStatus.findMany();
+
+        return statuses
+    }
+
+    async getAllCategoriesAsync() {
+        const categories = await prisma.feedbackCategory.findMany();
+
+        return categories
     }
 
     async createAsync(feedback: FeedbackModel) {
@@ -33,8 +42,7 @@ export class FeedbackRepository {
         });
 
         if (!existingFeedback) {
-            // TODO: typed error
-            throw new Error('Feedback not found');
+            throw new NonexistentError('Feedback not found');
         }
 
         // Update the feedback
@@ -55,7 +63,7 @@ export class FeedbackRepository {
         });
 
         if (!feedback) {
-            throw new Error('User not found');;
+            throw new NonexistentError('Feedback not found');
         }
 
         return feedback

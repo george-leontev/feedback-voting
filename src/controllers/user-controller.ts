@@ -2,6 +2,7 @@ import { JsonController, Body, Param, Res, Get, Post } from 'routing-controllers
 import { UserModel } from '../models/user-model';
 import { UserRepository } from '../repositories/user-repository';
 import { DuplicateEntityError } from '../errors/duplicate-entity-error';
+import { StatusCodes } from 'http-status-codes';
 
 
 @JsonController('/users')
@@ -18,7 +19,7 @@ export class UserController {
             const user = await this.userRepository.getAsync(id);
 
             if (!user) {
-                return response.status(404).json({ message: 'User not found' });
+                return response.status(StatusCodes.NOT_FOUND).json({ message: 'User not found' });
             }
 
             return user;
@@ -26,7 +27,7 @@ export class UserController {
         catch (error) {
             console.error(error);
 
-            return response.status(500).json({ message: 'Internal server error: ' + (error as Error).message });
+            return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error: ' + (error as Error).message });
         }
     };
 
@@ -36,14 +37,15 @@ export class UserController {
         try {
             const newUser = await this.userRepository.createAsync(user);
 
-            return response.status(201).json(newUser);
-        } catch (error: any) {
+            return response.status(StatusCodes.CREATED).json(newUser);
+        }
+        catch (error: any) {
             console.error(error);
             if (error instanceof DuplicateEntityError) {
-                return response.status(400).json({ message: error.message });
+                return response.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
             }
 
-            return response.status(500).json({ message: 'Internal server error' });
+            return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
         }
     };
 }

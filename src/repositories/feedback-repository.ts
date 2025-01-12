@@ -17,9 +17,9 @@ export class FeedbackRepository {
             data: {
                 title: feedback.title,
                 description: feedback.description,
-                category: feedback.category,
-                status: feedback.status,
-                author: { connect: { id: feedback.authorId } }
+                categoryId: feedback.categoryId,
+                statusId: feedback.statusId,
+                authorId: feedback.authorId
             },
         });
 

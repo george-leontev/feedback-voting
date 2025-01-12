@@ -65,10 +65,10 @@ paths:
                                             type: string
                                         description:
                                             type: string
-                                        category:
-                                            type: string
-                                        status:
-                                            type: string
+                                        categoryId:
+                                            type: number
+                                        statusId:
+                                            type: number
                                         authorId:
                                             type: integer
                                         createdAt:
@@ -94,10 +94,10 @@ paths:
                                     type: string
                                 description:
                                     type: string
-                                category:
-                                    type: string
-                                status:
-                                    type: string
+                                categoryId:
+                                    type: number
+                                statusId:
+                                    type: number
                                 authorId:
                                     type: number
             responses:
@@ -129,10 +129,10 @@ paths:
                                     type: string
                                 description:
                                     type: string
-                                category:
-                                    type: string
-                                status:
-                                    type: string
+                                categoryId:
+                                    type: number
+                                statusId:
+                                    type: number
             responses:
                 200:
                     description: Feedback updated successfully
@@ -147,10 +147,10 @@ paths:
                                     type: string
                                 description:
                                     type: string
-                                category:
-                                    type: string
-                                status:
-                                    type: string
+                                categoryId:
+                                    type: number
+                                statusId:
+                                    type: number
                                 authorId:
                                     type: integer
                                 createdAt:

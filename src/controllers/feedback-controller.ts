@@ -1,7 +1,6 @@
 import { Body, Delete, Get, JsonController, Param, Post, Put, Res } from 'routing-controllers';
 import { Response } from 'express';
 import { FeedbackModel } from '../models/feedback-model';
-import { prisma } from '../app';
 import { FeedbackStatuses } from '../models/enums/feedback-statuses';
 import { FeedbackCategories } from '../models/enums/feedback-categories';
 import { FeedbackRepository } from '../repositories/feedback-repository';
@@ -30,11 +29,6 @@ export class FeedbackController {
     @Post()
     async postAsync(@Body() feedback: FeedbackModel, @Res() response: Response): Promise<any> {
 
-        const validStatuses = ['Идея', 'Запланировано', 'В_работе', 'Выполнено'];
-        if (!validStatuses.includes(feedback.status)) {
-            return response.status(400).json({ message: 'Invalid status' });
-        }
-
         try {
             const newFeedback = await this.feedbackRepository.createAsync(feedback as FeedbackModel);
 
@@ -49,7 +43,6 @@ export class FeedbackController {
     @Put('/:id')
     async updateAsync(@Param('id') id: number, @Body() feedback: FeedbackModel, @Res() response: any): Promise<any> {
         try {
-            // Call the service to update the feedback
             const updatedFeedback = await this.feedbackRepository.updateAsync(id, feedback);
 
             return updatedFeedback;

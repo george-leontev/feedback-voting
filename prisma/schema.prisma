@@ -7,50 +7,59 @@ generator client {
     provider = "prisma-client-js"
 }
 
-enum FeedbackStatus {
-    Идея
-    Запланировано
-    В_работе            @map("В работе")
-    Выполнено
-}
-
-enum FeedbackCategories {
-    Функциональность
-    Баг
-    UI
-    Производительность
-}
-
 model User {
     id        Int        @id @default(autoincrement())
     email     String     @unique
     password  String     @unique
-    avatar    String     @default("")
-    feedback  Feedback[]
-    createdAt DateTime   @default(now())
-    Vote      Vote[]
+    avatar    String
+    createdAt DateTime   @default(now()) @map("created_at")
+    feedbacks Feedback[]
+    votes     Vote[]
+
+    @@map("user")
 }
 
 model Feedback {
-    id          Int                @id @default(autoincrement())
-    title       String
-    description String
-    category    FeedbackCategories
-    status      FeedbackStatus
-    authorId    Int
-    author      User               @relation(fields: [authorId], references: [id])
-    createdAt   DateTime           @default(now())
-    updatedAt   DateTime           @default(now())
-    Vote        Vote[]
+    id           Int              @id @default(autoincrement())
+    title        String
+    description  String
+    authorId     Int              @map("author_id")
+    createdAt    DateTime         @default(now()) @map("created_at")
+    updatedAt    DateTime         @default(now()) @map("updated_at")
+    categoryId Int              @map("categories_id")
+    statusId     Int              @map("status_id")
+    author       User             @relation(fields: [authorId], references: [id])
+    category     FeedbackCategory @relation(fields: [categoryId], references: [id])
+    status       FeedbackStatus   @relation(fields: [statusId], references: [id])
+    votes        Vote[]
+
+    @@map("feedback")
 }
 
 model Vote {
-    id         Int      @id @default(autoincrement())
-    userId     Int
-    feedbackId Int
+    id         Int @id @default(autoincrement())
+    userId     Int @map("user_id")
+    feedbackId Int @map("feedback_id")
 
     user     User     @relation(fields: [userId], references: [id])
     feedback Feedback @relation(fields: [feedbackId], references: [id])
 
     @@unique([userId, feedbackId]) // Ensure a user can only vote once per feedback
+    @@map("vote")
+}
+
+model FeedbackStatus {
+    id        Int        @id @default(autoincrement())
+    name      String     @db.VarChar(64)
+    feedbacks Feedback[]
+
+    @@map("feedback_status")
+}
+
+model FeedbackCategory {
+    id        Int        @id @default(autoincrement())
+    name      String     @db.VarChar(64)
+    feedbacks Feedback[]
+
+    @@map("feedback_category")
 }

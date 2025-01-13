@@ -1,11 +1,13 @@
-import { Body, Delete, Get, JsonController, Param, Post, Put, Res } from 'routing-controllers';
+import { Body, Delete, Get, JsonController, Param, Post, Put, Res, UseBefore } from 'routing-controllers';
 import { Response } from 'express';
 import { FeedbackModel } from '../models/feedback-model';
 import { FeedbackRepository } from '../repositories/feedback-repository';
 import { StatusCodes } from 'http-status-codes';
 import { NonexistentError } from '../errors/nonexistent-error';
+import { Authorize } from '../middleware/authorize';
 
-@JsonController('/feedback')
+@UseBefore(Authorize)
+@JsonController('/api/feedback')
 export class FeedbackController {
 
     constructor(private feedbackRepository: FeedbackRepository) {

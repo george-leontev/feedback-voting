@@ -9,6 +9,9 @@
         "outDir": "../dist",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "typeRoots": [
+            "./src/@types"
+        ],
     }
 }

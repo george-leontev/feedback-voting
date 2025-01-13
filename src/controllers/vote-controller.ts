@@ -1,10 +1,12 @@
 import { VoteModel } from '../models/vote-model';
-import { Body, JsonController, Post, Res } from 'routing-controllers';
+import { Body, JsonController, Post, Res, UseBefore } from 'routing-controllers';
 import { VoteRepository } from '../repositories/vote-repository';
 import { StatusCodes } from 'http-status-codes';
 import { DuplicateEntityError } from '../errors/duplicate-entity-error';
+import { Authorize } from '../middleware/authorize';
 
-@JsonController('/vote')
+@UseBefore(Authorize)
+@JsonController('/api/vote')
 export class VoteController {
 
     private voteRepository: VoteRepository;

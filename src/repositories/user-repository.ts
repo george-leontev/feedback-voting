@@ -10,12 +10,12 @@ export class UserRepository {
      * @param {number} id User identifier
      * @returns {Promise<UserModel>} Object type of UserModel
      */
-    async getAsync(id: number): Promise<UserModel> {
+    async getAsync(id: number): Promise<UserModel | null> {
         const user = await prisma.user.findUnique({
             where: { id: id },
         });
 
-        return user as UserModel;
+        return user ? user as UserModel : user;
     }
 
     /**
@@ -45,4 +45,11 @@ export class UserRepository {
         return newUser;
     };
 
+    async getByEmail(email: string): Promise<UserModel | null> {
+        const user = await prisma.user.findUnique({
+            where: { email: email }
+        });
+
+        return user ? user as UserModel : user;
+    }
 }

@@ -1,16 +1,49 @@
 openapi: 3.0.0
 info:
-    title: User API
+    title: Feedback Voting API
     version: 1.0.0
     description: API for user management
+components:
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+security:
+    - BearerAuth: []
 paths:
+    /auth/sign-in:
+        post:
+            security: [] # No security required for this endpoint
+            summary: Authorize user
+            tags: [Auth]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                password:
+                                    type: string
+                                email:
+                                    type: string
+            responses:
+                201:
+                    description: User was authorized successfully
+                400:
+                    description: Bad request (probably missing feedbackId or userId)
+                500:
+                    description: Internal server error
+
     /api/users/{id}:
         get:
             summary: Get user by id
             tags: [Users]
             parameters:
-                - in: path
-                  name: id
+                - name: id
+                  in: path
                   required: true
                   schema:
                       type: number
@@ -242,19 +275,19 @@ paths:
                             schema:
                                 type: object
                                 properties:
-                                id:
-                                    type: integer
-                                    description: The ID of the created vote
-                                userId:
-                                    type: integer
-                                    description: The ID of the user who voted
-                                feedbackId:
-                                    type: integer
-                                    description: The ID of the feedback proposal voted on
-                                createdAt:
-                                    type: string
-                                    format: date-time
-                                    description: The timestamp when the vote was created
+                                    id:
+                                        type: integer
+                                        description: The ID of the created vote
+                                    userId:
+                                        type: integer
+                                        description: The ID of the user who voted
+                                    feedbackId:
+                                        type: integer
+                                        description: The ID of the feedback proposal voted on
+                                    createdAt:
+                                        type: string
+                                        format: date-time
+                                        description: The timestamp when the vote was created
                 400:
                     description: Bad request (probably missing feedbackId or userId)
                 500:

@@ -1,11 +1,14 @@
-import { JsonController, Body, Param, Res, Get, Post } from 'routing-controllers'
+import { JsonController, Body, Param, Res, Get, Post, UseBefore } from 'routing-controllers'
 import { UserModel } from '../models/user-model';
 import { UserRepository } from '../repositories/user-repository';
 import { DuplicateEntityError } from '../errors/duplicate-entity-error';
 import { StatusCodes } from 'http-status-codes';
+import { Authorize } from '../middleware/authorize';
+import { AuthUser } from '../decorators/auth-user';
 
 
-@JsonController('/users')
+@UseBefore(Authorize)
+@JsonController('/api/users')
 export class UserController {
     private userRepository: UserRepository;
 
@@ -14,7 +17,7 @@ export class UserController {
     }
 
     @Get('/:id')
-    async getAsync(@Param('id') id: number, @Res() response: any): Promise<any> {
+    async getAsync(@AuthUser() authUser: any, @Param('id') id: number, @Res() response: any): Promise<any> {
         try {
             const user = await this.userRepository.getAsync(id);
 

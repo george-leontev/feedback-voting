@@ -1,6 +1,10 @@
 import { prisma } from '../app';
-import { NonexistentError } from '../errors/nonexistent-error';
+import { NotFoundEntityError } from '../errors/not-found-entity-error';
 import { FeedbackModel } from '../models/feedback-model';
+import { FeedbackPagedItemsModel } from '../models/feedback-paged-items-model';
+import { DynamicObjectModel } from '../models/order-by-model';
+import { FeedbackQueryModel } from '../models/paging-model';
+
 
 export class FeedbackRepository {
     async getAllAsync() {
@@ -36,16 +40,14 @@ export class FeedbackRepository {
     };
 
     async updateAsync(id: number, feedback: FeedbackModel) {
-        // Check if the feedback exists
         const existingFeedback = await prisma.feedback.findUnique({
             where: { id: id },
         });
 
         if (!existingFeedback) {
-            throw new NonexistentError('Feedback not found');
+            throw new NotFoundEntityError('Feedback not found');
         }
 
-        // Update the feedback
         const updatedFeedback = await prisma.feedback.update({
             where: { id: id },
             data: {
@@ -63,9 +65,31 @@ export class FeedbackRepository {
         });
 
         if (!feedback) {
-            throw new NonexistentError('Feedback not found');
+            throw new NotFoundEntityError('Feedback not found');
         }
 
         return feedback
+    }
+
+    async getPagedAsync(pagingInfo: FeedbackQueryModel) {
+        const offset = (pagingInfo.page - 1) * pagingInfo.limit;
+
+        const orderBy: DynamicObjectModel = {};
+        orderBy[pagingInfo.sortField] = pagingInfo.ascending ? 'asc' : 'desc';
+
+        const where: DynamicObjectModel = {};
+        where[pagingInfo.filterField] = pagingInfo.filterValue;
+
+        const feedbackVotes = await prisma.feedbackVote.findMany({
+            skip: offset,
+            take: pagingInfo.limit,
+            orderBy: orderBy,
+            where: where
+        });
+
+        return {
+            ...pagingInfo,
+            items: feedbackVotes
+        } as FeedbackPagedItemsModel;
     }
 }

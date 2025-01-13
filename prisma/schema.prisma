@@ -4,7 +4,8 @@ datasource db {
 }
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["views"]
 }
 
 model User {
@@ -20,18 +21,19 @@ model User {
 }
 
 model Feedback {
-    id           Int              @id @default(autoincrement())
-    title        String
-    description  String
-    authorId     Int              @map("author_id")
-    createdAt    DateTime         @default(now()) @map("created_at")
-    updatedAt    DateTime         @default(now()) @map("updated_at")
-    categoryId Int              @map("categories_id")
-    statusId     Int              @map("status_id")
-    author       User             @relation(fields: [authorId], references: [id])
-    category     FeedbackCategory @relation(fields: [categoryId], references: [id])
-    status       FeedbackStatus   @relation(fields: [statusId], references: [id])
-    votes        Vote[]
+    id          Int              @id @default(autoincrement())
+    title       String
+    description String
+    authorId    Int              @map("author_id")
+    createdAt   DateTime         @default(now()) @map("created_at")
+    updatedAt   DateTime         @default(now()) @map("updated_at")
+    // !!categories!!
+    categoryId  Int              @map("category_id")
+    statusId    Int              @map("status_id")
+    author      User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    category    FeedbackCategory @relation(fields: [categoryId], references: [id])
+    status      FeedbackStatus   @relation(fields: [statusId], references: [id])
+    votes       Vote[]
 
     @@map("feedback")
 }
@@ -41,8 +43,8 @@ model Vote {
     userId     Int @map("user_id")
     feedbackId Int @map("feedback_id")
 
-    user     User     @relation(fields: [userId], references: [id])
-    feedback Feedback @relation(fields: [feedbackId], references: [id])
+    user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    feedback Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
 
     @@unique([userId, feedbackId]) // Ensure a user can only vote once per feedback
     @@map("vote")
@@ -62,4 +64,18 @@ model FeedbackCategory {
     feedbacks Feedback[]
 
     @@map("feedback_category")
+}
+
+view FeedbackVote {
+    id          Int      @id @default(autoincrement())
+    title       String
+    description String
+    authorId    Int      @map("author_id")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @default(now()) @map("updated_at")
+    categoryId  Int      @map("category_id")
+    statusId    Int      @map("status_id")
+    count       Int
+
+    @@map("feedback_vote")
 }

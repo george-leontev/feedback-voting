@@ -1,10 +1,11 @@
-import { Body, Delete, Get, JsonController, Param, Post, Put, Res, UseBefore } from 'routing-controllers';
+import { Body, Delete, Get, HttpCode, JsonController, Param, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
 import { Response } from 'express';
 import { FeedbackModel } from '../models/feedback-model';
 import { FeedbackRepository } from '../repositories/feedback-repository';
 import { StatusCodes } from 'http-status-codes';
-import { NonexistentError } from '../errors/nonexistent-error';
 import { Authorize } from '../middleware/authorize';
+import { FeedbackQueryModel } from '../models/paging-model';
+import { NotFoundEntityError } from '../errors/not-found-entity-error';
 
 @UseBefore(Authorize)
 @JsonController('/api/feedback')
@@ -27,12 +28,13 @@ export class FeedbackController {
     }
 
     @Post()
+    @HttpCode(StatusCodes.CREATED)
     async postAsync(@Body() feedback: FeedbackModel, @Res() response: Response): Promise<any> {
 
         try {
             const newFeedback = await this.feedbackRepository.createAsync(feedback as FeedbackModel);
 
-            return response.status(StatusCodes.CREATED).json(newFeedback);
+            return newFeedback;
         }
         catch (error) {
             console.error(error);
@@ -49,7 +51,7 @@ export class FeedbackController {
         }
         catch (error: any) {
             console.error(error);
-            if (error instanceof NonexistentError) {
+            if (error instanceof NotFoundEntityError) {
                 return response.status(StatusCodes.NOT_FOUND).json({ message: error.message });
             }
 
@@ -58,14 +60,15 @@ export class FeedbackController {
     };
 
     @Delete('/:id')
+    @HttpCode(StatusCodes.NO_CONTENT)
     async deleteAsync(@Param('id') id: number, @Res() response: any): Promise<any> {
         try {
             const deletedFeedback = this.feedbackRepository.deleteAsync(id);
 
-            return response.status(StatusCodes.NO_CONTENT).json(deletedFeedback);
+            return deletedFeedback;
         }
         catch (error) {
-            if (error instanceof NonexistentError) {
+            if (error instanceof NotFoundEntityError) {
                 return response.status(StatusCodes.NOT_FOUND).json({ message: error.message });
             }
             console.error(error);
@@ -96,4 +99,33 @@ export class FeedbackController {
             response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to retrieve feedback categories' });
         }
     };
+
+    @Get('/:page/:limit/:sortField/:ascending/:filterField/:filterValue')
+    async getAllSuggestionsAsync(
+        @Param('page') page: number,
+        @Param('limit') limit: number,
+        @Param('sortField') sortField: string,
+        @Param('ascending') ascending: boolean,
+        @Param('filterField') filterField: string,
+        @Param('filterValue') filterValue: number,
+        @Res() response: Response
+    ): Promise<any> {
+        const pagingInfo: FeedbackQueryModel = {
+            page,
+            limit,
+            sortField,
+            ascending,
+            filterField,
+            filterValue,
+        };
+
+        try {
+            const pagedFeeedbackVotes = await this.feedbackRepository.getPagedAsync(pagingInfo);
+
+            return pagedFeeedbackVotes;
+        }
+        catch (error) {
+            response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to retrieve feedbacks' });
+        }
+    }
 }

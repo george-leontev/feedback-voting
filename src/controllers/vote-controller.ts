@@ -1,5 +1,5 @@
 import { VoteModel } from '../models/vote-model';
-import { Body, JsonController, Post, Res, UseBefore } from 'routing-controllers';
+import { Body, HttpCode, JsonController, Post, Res, UseBefore } from 'routing-controllers';
 import { VoteRepository } from '../repositories/vote-repository';
 import { StatusCodes } from 'http-status-codes';
 import { DuplicateEntityError } from '../errors/duplicate-entity-error';
@@ -16,12 +16,13 @@ export class VoteController {
     }
 
     @Post()
-    async postAsync(@Body() vote: VoteModel, @Res() response: any): Promise<void> {
+    @HttpCode(StatusCodes.CREATED)
+    async postAsync(@Body() vote: VoteModel, @Res() response: any): Promise<VoteModel> {
         try {
 
             const newVote = await this.voteRepository.createAsync(vote);
 
-            return response.status(StatusCodes.CREATED).json(newVote);
+            return newVote;
         }
         catch (error) {
             console.error(error);

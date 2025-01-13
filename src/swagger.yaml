@@ -3,6 +3,7 @@ info:
     title: Feedback Voting API
     version: 1.0.0
     description: API for user management
+
 components:
     securitySchemes:
         BearerAuth:
@@ -12,6 +13,7 @@ components:
 
 security:
     - BearerAuth: []
+
 paths:
     /auth/sign-in:
         post:
@@ -292,3 +294,50 @@ paths:
                     description: Bad request (probably missing feedbackId or userId)
                 500:
                     description: Internal server error
+
+    /api/feedback/{page}/{limit}/{sortField}/{ascending}/{filterField}/{filterValue}:
+        get:
+            summary: Retrieve paginated feedbacks
+            parameters:
+                - name: page
+                  in: path
+                  required: true
+                  schema:
+                    type: number
+
+                - name: limit
+                  in: path
+                  required: true
+                  schema:
+                    type: number
+
+                - name: sortField
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+
+                - name: ascending
+                  in: path
+                  required: true
+                  schema:
+                    type: boolean
+
+                - name: filterField
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+
+                - name: filterValue
+                  in: path
+                  required: true
+                  schema:
+                    type: number
+            responses:
+                200:
+                    description: Successful response with paginated and sorted feedback items.
+                400:
+                    description: Bad request, invalid parameters.
+                500:
+                    description: Internal server error.

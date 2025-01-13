@@ -1,4 +1,4 @@
-import { JsonController, Body, Param, Res, Get, Post, UseBefore } from 'routing-controllers'
+import { JsonController, Body, Param, Res, Get, Post, UseBefore, HttpCode } from 'routing-controllers'
 import { UserModel } from '../models/user-model';
 import { UserRepository } from '../repositories/user-repository';
 import { DuplicateEntityError } from '../errors/duplicate-entity-error';
@@ -35,12 +35,13 @@ export class UserController {
     };
 
     @Post()
+    @HttpCode(StatusCodes.CREATED)
     async postAsync(@Body() user: UserModel, @Res() response: any): Promise<any> {
 
         try {
             const newUser = await this.userRepository.createAsync(user);
 
-            return response.status(StatusCodes.CREATED).json(newUser);
+            return newUser;
         }
         catch (error: any) {
             console.error(error);

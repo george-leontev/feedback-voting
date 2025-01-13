@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "ES6",
+        "target": "ES2018",
         "module": "commonjs",
         "strict": true,
         "esModuleInterop": true,
@@ -10,8 +10,11 @@
         "sourceMap": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "typeRoots": [
-            "./src/@types"
+        "types": [
+            "node"
         ],
+        "typeRoots": [
+            "src/@types"
+        ]
     }
 }

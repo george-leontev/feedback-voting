@@ -22,7 +22,7 @@ export class UserController {
     }
 
     @Get('/:id')
-    async getAsync(@AuthUser() authUser: any, @Param('id') id: number, @Res() response: any): Promise<any> {
+    async getAsync(@Param('id') id: number, @Res() response: any): Promise<any> {
         try {
             const user = await this.userRepository.getAsync(id);
 

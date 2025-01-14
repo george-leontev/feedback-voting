@@ -299,7 +299,8 @@ paths:
 
     /api/feedback/{page}/{limit}/{sortField}/{ascending}/{filterField}/{filterValue}:
         get:
-            summary: Retrieve paginated feedbacks
+            summary: Retrieve paginated feedbacks with sorting and filtering
+            tags: [Feedbacks]
             parameters:
                 - name: page
                   in: path

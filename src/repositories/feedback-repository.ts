@@ -33,7 +33,6 @@ export class FeedbackRepository {
     async createAsync(feedback: FeedbackModel) {
         const newFeedback = await prisma.feedback.create({
             data: {
-                // TODO: check if the field created changes after update
                 ...feedback
             },
         });

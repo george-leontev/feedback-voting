@@ -7,15 +7,15 @@ services:
         environment:
             - POSTGRES_PASSWORD=0987654321
             - POSTGRES_USER=postgres
-        volumes:
-            - feedback-voting-database-volume:/var/lib/postgresql/data
+        # volumes:
+        #     - feedback-voting-database-volume:/var/lib/postgresql/data
         ports:
             - 5432:5432
 
-volumes:
-    feedback-voting-database-volume:
-        driver: local
-        driver_opts:
-            o: bind
-            type: none
-            device: ./.database
+# volumes:
+#     feedback-voting-database-volume:
+#         driver: local
+#         driver_opts:
+#             o: bind
+#             type: none
+#             device: ./.database

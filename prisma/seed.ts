@@ -1,9 +1,27 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-    // await prisma.$executeRaw`select f.*, v.count from  feedback f left join (select v.feedback_id, count(*) count from vote v group by v.feedback_id) v on f.id = v.feedback_id`
+    // Create default user for testing
+    const hashedPassword = await bcrypt.hash('1234567890', 10);
+    const email = 'user@example.com';
+    const avatar = '/avatar.png';
+
+    await prisma.$executeRaw`insert into "user" (email, password, avatar) VALUES (${email}, ${hashedPassword}, ${avatar})`;
+
+    // Create view with count of votes to current feedback for sorting
+    await prisma.$executeRaw`
+        create view feedback_vote
+            as
+        select
+            f.*,
+            case when v.count is null then 0 ELSE v.count END AS count
+            from feedback f
+            left join (select v.feedback_id, count(*) count from vote v group by v.feedback_id) v on f.id = v.feedback_id
+    `
+
     // Delete existing records
     await prisma.feedbackStatus.deleteMany({});
     await prisma.feedbackCategory.deleteMany({});

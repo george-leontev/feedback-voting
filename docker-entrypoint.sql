@@ -1,3 +1,3 @@
-CREATE DATABASE nodejs_learning
+CREATE DATABASE feedback_voting
 WITH
     OWNER = postgres;

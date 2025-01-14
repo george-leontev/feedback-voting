@@ -44,4 +44,6 @@ export class VoteController {
             return response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
         }
     };
+
+    // TODO: delete vote
 }

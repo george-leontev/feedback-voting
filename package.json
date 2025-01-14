@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-learning",
+  "name": "feedback-voting",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

@@ -6,13 +6,18 @@ import { StatusCodes } from 'http-status-codes';
 import { Authorize } from '../middleware/authorize';
 import { AuthUser } from '../decorators/auth-user';
 
-
-@UseBefore(Authorize)
-@JsonController('/api/users')
+/**
+ * UserController handles HTTP requests related to user operations.
+ * It provides endpoints to get and post user.
+ */
+@UseBefore(Authorize) // Do unable to use this controller endpoints until authorized
+@JsonController('/api/users') // Define the base path for all routes in user controller
 export class UserController {
-    private userRepository: UserRepository;
 
-    constructor() {
+    /**
+     * Creates a new UserRepository instance for handling user operations
+     */
+    constructor(private userRepository: UserRepository) {
         this.userRepository = new UserRepository();
     }
 
@@ -35,7 +40,7 @@ export class UserController {
     };
 
     @Post()
-    @HttpCode(StatusCodes.CREATED)
+    @HttpCode(StatusCodes.CREATED) // HTTP response code to 201 (Created) for successful creation
     async postAsync(@Body() user: UserModel, @Res() response: any): Promise<any> {
 
         try {

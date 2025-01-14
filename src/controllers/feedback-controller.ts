@@ -7,18 +7,27 @@ import { Authorize } from '../middleware/authorize';
 import { FeedbackQueryModel } from '../models/paging-model';
 import { NotFoundEntityError } from '../errors/not-found-entity-error';
 
-@UseBefore(Authorize)
-@JsonController('/api/feedback')
+/**
+ * FeedbackController handles HTTP requests related to feedback operations.
+ * It provides endpoints for creating, updating, deleting, and retrieving feedback,
+ * as well as retrieving statuses and categories
+ */
+@UseBefore(Authorize) // Do unable to use this controller endpoints until authorized
+@JsonController('/api/feedback') // Define the base path for all routes in feedback controller
 export class FeedbackController {
 
+    /**
+     * Creates a new FeedbackRepository instance for handling feedback operations.
+     */
     constructor(private feedbackRepository: FeedbackRepository) {
         this.feedbackRepository = new FeedbackRepository();
     }
 
+
     @Get()
     async getAllAsync(@Res() response: Response): Promise<any> {
         try {
-            const feedbacks = this.feedbackRepository.getAllAsync();
+            const feedbacks = this.feedbackRepository.getAllAsync(); // Retrieve all feedback from the repository.
 
             return feedbacks;
         }
@@ -28,11 +37,11 @@ export class FeedbackController {
     }
 
     @Post()
-    @HttpCode(StatusCodes.CREATED)
+    @HttpCode(StatusCodes.CREATED) // HTTP response code to 201 (Created) for successful creation
     async postAsync(@Body() feedback: FeedbackModel, @Res() response: Response): Promise<any> {
 
         try {
-            const newFeedback = await this.feedbackRepository.createAsync(feedback as FeedbackModel);
+            const newFeedback = await this.feedbackRepository.createAsync(feedback as FeedbackModel); // Create a new feedback item.
 
             return newFeedback;
         }
@@ -60,7 +69,7 @@ export class FeedbackController {
     };
 
     @Delete('/:id')
-    @HttpCode(StatusCodes.NO_CONTENT)
+    @HttpCode(StatusCodes.NO_CONTENT) // HTTP response code to 204 (No Content) for successful deletion
     async deleteAsync(@Param('id') id: number, @Res() response: any): Promise<any> {
         try {
             const deletedFeedback = this.feedbackRepository.deleteAsync(id);
@@ -100,6 +109,19 @@ export class FeedbackController {
         }
     };
 
+    /**
+     * Retrieves feedback items with pagination, sorting, and filtering
+     * @param {number} page - The page number for pagination.
+     * @param {number} limit - The number of items per page.
+     * @param {string} sortField - The field to sort by.
+     * @param {boolean} ascending - Specifies the order in which to sort.
+     * @param {string} filterField - The field to filter by.
+     * @param {number} filterValue - The value to filter by.
+     * @param {Response} response - The Express response object.
+     * @returns {Promise<any>} Paged feedback items.
+     */
+    // Here I implement pagination with sorting and filtering at the same time.
+    // In the production case it is necessary to implement the ability to perform these actions separately.
     @Get('/:page/:limit/:sortField/:ascending/:filterField/:filterValue')
     async getAllSuggestionsAsync(
         @Param('page') page: number,

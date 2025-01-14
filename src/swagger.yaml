@@ -11,7 +11,9 @@ components:
             scheme: bearer
             bearerFormat: JWT
 
+# Global security requirements for the API.
 security:
+    # Specifies that the BearerAuth security scheme is required for all operations.
     - BearerAuth: []
 
 paths:

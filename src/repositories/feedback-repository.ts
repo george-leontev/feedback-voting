@@ -5,8 +5,13 @@ import { FeedbackPagedItemsModel } from '../models/feedback-paged-items-model';
 import { DynamicObjectModel } from '../models/order-by-model';
 import { FeedbackQueryModel } from '../models/paging-model';
 
-
+/**
+ * FeedbackRepository is responsible for interacting with the feedback data in the database.
+ * It provides methods to create, read, update, and delete feedback entries, as well as retrieve
+ * statuses and categories related to feedback.
+ */
 export class FeedbackRepository {
+
     async getAllAsync() {
         const feedbacks = await prisma.feedback.findMany();
 
@@ -28,11 +33,8 @@ export class FeedbackRepository {
     async createAsync(feedback: FeedbackModel) {
         const newFeedback = await prisma.feedback.create({
             data: {
-                title: feedback.title,
-                description: feedback.description,
-                categoryId: feedback.categoryId,
-                statusId: feedback.statusId,
-                authorId: feedback.authorId
+                // TODO: check if the field created changes after update
+                ...feedback
             },
         });
 
@@ -45,14 +47,14 @@ export class FeedbackRepository {
         });
 
         if (!existingFeedback) {
-            throw new NotFoundEntityError('Feedback not found');
+            throw new NotFoundEntityError('Feedback not found'); // Throw my own error if not found
         }
 
         const updatedFeedback = await prisma.feedback.update({
             where: { id: id },
             data: {
                 ...feedback,
-                updatedAt: new Date(),
+                updatedAt: new Date(), // Update the timestamp
             },
         });
 
@@ -65,31 +67,36 @@ export class FeedbackRepository {
         });
 
         if (!feedback) {
-            throw new NotFoundEntityError('Feedback not found');
+            throw new NotFoundEntityError('Feedback not found'); // Also throw my own error if not found
         }
 
         return feedback
     }
 
+    /**
+     * Retrieves a paginated list of feedback votes based on the provided paging information
+     * @param {FeedbackQueryModel} pagingInfo - The paging information including page, limit, sort field, and filter.
+     * @returns {Promise<FeedbackPagedItemsModel>} Returns a paginated list of feedback votes.
+     */
     async getPagedAsync(pagingInfo: FeedbackQueryModel) {
-        const offset = (pagingInfo.page - 1) * pagingInfo.limit;
+        const offset = (pagingInfo.page - 1) * pagingInfo.limit; // Calculate the offset for pagination
 
         const orderBy: DynamicObjectModel = {};
-        orderBy[pagingInfo.sortField] = pagingInfo.ascending ? 'asc' : 'desc';
+        orderBy[pagingInfo.sortField] = pagingInfo.ascending ? 'asc' : 'desc'; // Determine sort order
 
         const where: DynamicObjectModel = {};
-        where[pagingInfo.filterField] = pagingInfo.filterValue;
+        where[pagingInfo.filterField] = pagingInfo.filterValue; // Set the filter condition
 
         const feedbackVotes = await prisma.feedbackVote.findMany({
-            skip: offset,
-            take: pagingInfo.limit,
-            orderBy: orderBy,
-            where: where
+            skip: offset, // Skip the number of entries based on the current page
+            take: pagingInfo.limit, // Limit the number of entries returned
+            orderBy: orderBy, // Apply sorting
+            where: where // Apply filtering
         });
 
         return {
             ...pagingInfo,
-            items: feedbackVotes
+            items: feedbackVotes // Include retrieved reviews with their votes
         } as FeedbackPagedItemsModel;
     }
 }

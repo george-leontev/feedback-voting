@@ -12,6 +12,7 @@ import { VoteController } from './controllers/vote-controller';
 import { AuthController } from './controllers/auth-controller';
 import { RootController } from './controllers/root-controller';
 
+// Create an Express server with specified controllers
 const app = createExpressServer({
     controllers: [RootController, AuthController, UserController, FeedbackController, VoteController]
 });
@@ -23,10 +24,11 @@ app.use(express.json());
 //   allowedHeaders: ['Authorization', 'Content-Type'],
 // }));
 
+// Load and serve the Swagger documentation
 const swaggerDocument = YAML.load(path.join(__dirname, 'swagger.yaml'));
 app.use('/swagger-ui', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-
+// Initialize the Prisma client for database interactions
 export const prisma = new PrismaClient();
 
 const PORT = process.env.PORT || 3000;

@@ -1,20 +1,20 @@
 {
     "compilerOptions": {
-        "target": "ES2018",
+        "target": "ES2024",
         "module": "commonjs",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "outDir": "../dist",
+        "outDir": "./dist",
+        "rootDirs": [
+            "./src"
+        ],
         "sourceMap": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "types": [
             "node"
-        ],
-        "typeRoots": [
-            "src/@types"
         ]
     }
 }

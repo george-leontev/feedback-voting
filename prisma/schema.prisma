@@ -1,11 +1,12 @@
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+    schemas  = ["admin", "business", "dictionary"]
 }
 
 generator client {
     provider        = "prisma-client-js"
-    previewFeatures = ["views"]
+    previewFeatures = ["views", "multiSchema"]
 }
 
 model User {
@@ -18,6 +19,7 @@ model User {
     votes     Vote[]
 
     @@map("user")
+    @@schema("admin")
 }
 
 model Feedback {
@@ -27,7 +29,6 @@ model Feedback {
     authorId    Int              @map("author_id")
     createdAt   DateTime         @default(now()) @map("created_at")
     updatedAt   DateTime         @default(now()) @map("updated_at")
-    // !!categories!!
     categoryId  Int              @map("category_id")
     statusId    Int              @map("status_id")
     author      User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -36,6 +37,7 @@ model Feedback {
     votes       Vote[]
 
     @@map("feedback")
+    @@schema("business")
 }
 
 model Vote {
@@ -48,6 +50,7 @@ model Vote {
 
     @@unique([userId, feedbackId]) // Ensure a user can only vote once per feedback
     @@map("vote")
+    @@schema("business")
 }
 
 model FeedbackStatus {
@@ -56,6 +59,7 @@ model FeedbackStatus {
     feedbacks Feedback[]
 
     @@map("feedback_status")
+    @@schema("dictionary")
 }
 
 model FeedbackCategory {
@@ -64,6 +68,7 @@ model FeedbackCategory {
     feedbacks Feedback[]
 
     @@map("feedback_category")
+    @@schema("dictionary")
 }
 
 view FeedbackVote {
@@ -78,4 +83,5 @@ view FeedbackVote {
     count       Int
 
     @@map("feedback_vote")
+    @@schema("dictionary")
 }

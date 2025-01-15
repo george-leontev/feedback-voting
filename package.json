@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/app.ts",
-    "seed": "ts-node prisma/seed.ts"
+    "start": "ts-node src/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -35,5 +34,8 @@
     "reflect-metadata": "^0.2.2",
     "swagger-ui-express": "^5.0.1",
     "yamljs": "^0.3.0"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }

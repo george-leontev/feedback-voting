@@ -1,0 +1,20 @@
+FROM node:lts
+
+WORKDIR /app
+
+COPY ./src ./src
+COPY ./prisma ./prisma
+COPY ./package.json ./
+COPY ./.env.production ./.env
+COPY ./tsconfig.json ./
+
+RUN npm install -g typescript
+RUN npm install
+RUN tsc
+RUN rm -rf ./src
+RUN mv ./dist/src ./
+RUN rm -rf ./dist
+COPY ./src/swagger.yaml ./src
+
+EXPOSE 3000
+
